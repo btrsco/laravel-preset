@@ -7,12 +7,12 @@
 </p>
 
 <h2 align="center">laravel-preset</h2>
-<pre><div align="center">npx @preset/cli apply username//Users/btrsco/Developer/_presets/laravel-preset</div></pre>
+<pre><div align="center">npx @preset/cli apply btrsco/laravel-preset</div></pre>
 
 <br />
 
 <div align="center">
-  This preset was made by @@author.
+  This preset was made by @btrsco.
   <br />
   <br />
   <a href="https://preset.dev">Learn more</a>

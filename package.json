@@ -1,6 +1,8 @@
 {
   "private": true,
-  "author": "@@author <@@email>",
+  "name": "laravel-preset",
+  "author": "Miguel Batres <miguel@batres.co>",
+  "description": "Preset to install Vite, Tailwind, Vue, Sass, Inertia, Breeze Scaffolding and more.",
   "license": "MIT",
   "preset": "preset.ts",
   "devDependencies": {

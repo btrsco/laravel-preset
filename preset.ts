@@ -92,8 +92,6 @@ export default definePreset({
                 await deletePaths({
                     title: 'remove default auth scaffolding',
                     paths: [
-                        'app/Http/Controllers/ProfileController.php',
-                        'app/Http/Requests',
                         'app/Http/View',
                         'app/resources/css',
                         'app/resources/js',

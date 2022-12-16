@@ -139,14 +139,53 @@ export default definePreset({
         });
 
         await group({
-            title: 'build assets',
+            title: 'build assets & helpers',
             handler: async () => {
+                // Generate ziggy routes
+                await executeCommand({
+                    command: 'php',
+                    arguments: [
+                        'artisan',
+                        'ziggy:generate',
+                    ],
+                });
+
                 // Build assets
                 await executeCommand({
                     command: 'npm',
                     arguments: [
                         'run',
                         'build',
+                    ],
+                });
+
+                // Generate phpstorm meta helper files
+                await executeCommand({
+                    command: 'php',
+                    arguments: [
+                        'artisan',
+                        'ide-helper:meta',
+                    ],
+                });
+
+                // Generate ide helper files
+                await executeCommand({
+                    command: 'php',
+                    arguments: [
+                        'artisan',
+                        'ide-helper:generate',
+                        '--write_mixins',
+                    ],
+                });
+
+                // Generate ide models helper files
+                await executeCommand({
+                    command: 'php',
+                    arguments: [
+                        'artisan',
+                        'ide-helper:models',
+                        '--write-mixin',
+                        '--reset',
                     ],
                 });
             }

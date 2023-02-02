@@ -77,7 +77,7 @@ export default definePreset({
         });
 
         await group({
-            title: 'initalize laravel breeze',
+            title: 'initialize laravel breeze',
             handler: async () => {
                 // Initialize Laravel Breeze
                 await executeCommand({
@@ -85,6 +85,7 @@ export default definePreset({
                     arguments: [
                         'artisan',
                         'breeze:install',
+                        'blade',
                     ],
                 });
 
@@ -145,6 +146,7 @@ export default definePreset({
                     arguments: [
                         'artisan',
                         'ziggy:generate',
+                        './resources/scripts/helpers/ziggy.js'
                     ],
                 });
 

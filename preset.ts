@@ -46,6 +46,8 @@ export default definePreset({
                         '@inertiajs/inertia',
                         '@inertiajs/inertia-vue3',
                         '@inertiajs/progress',
+                        '@inertiajs/server',
+                        '@vue/server-renderer',
                         'alea-generator',
                         'dayjs',
                         'lodash',

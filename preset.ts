@@ -162,6 +162,8 @@ export default definePreset({
                     ],
                 });
 
+                // TODO: Handle running migrations before building model helpers
+
                 // Generate phpstorm meta helper files
                 await executeCommand({
                     command: 'php',

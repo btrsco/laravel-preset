@@ -101,11 +101,12 @@ export default {
     name:  'pageHead',
     props: {
         title:  { type: String, required: false },
-        suffix: { type: String, default: this.$page.props.app.name },
+        app:    { type: Object, required: false },
     },
     data() {
         return {
-            application: this.$page.props.app,
+            application: this.app ?? this.$page.props.app,
+            suffix:      this.$page.props.app.name,
         };
     },
 };

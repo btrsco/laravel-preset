@@ -13,7 +13,7 @@ return [
     'configs'      => [
         'default' => [
             'entrypoints' => [
-                'ssr'    => 'resources/scripts/ssr.ts',
+                'ssr'    => 'resources/scripts/ssr.js',
                 'paths'  => [
                     'resources/scss/app.scss',
                     'resources/scripts/main.js',
@@ -22,8 +22,7 @@ return [
             ],
             'dev_server'  => [
                 'enabled'                    => true,
-                'url'                        => env('DEV_SERVER_URL',
-                    'http://localhost:5173'),
+                'url'                        => env('DEV_SERVER_URL', 'http://localhost:5173'),
                 'ping_before_using_manifest' => true,
                 'ping_url'                   => null,
                 'ping_timeout'               => 1,

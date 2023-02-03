@@ -2,10 +2,10 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
 
-        @if( app()->environment( ['local', 'staging'] ) )
+        @env(['local', 'staging'])
             <meta name="robots"
                   content="noindex, nofollow">
-        @endif
+        @endenv
 
         <meta charset="utf-8">
         <meta name="viewport"
@@ -22,17 +22,16 @@
 
         <link rel="dns-prefetch"
               href="https://cdn.serve.ooo">
+        <link rel="preconnect"
+              href="https://cdn.serve.ooo">
 
-        @if( !app()->environment(['local', 'staging']) )
+        @production
             <script defer
                     data-domain=""
                     src="https://a.serve.ooo/js/plausible.js"></script>
-        @else
-            <script defer
-                    data-domain=""
-                    src="https://a.serve.ooo/js/plausible.js"></script>
-        @endif
-        <script>window.plausible = window.plausible || function () { ( window.plausible.q = window.plausible.q || [] ).push( arguments ) }</script>
+            <script>window.plausible = window.plausible ||
+                      function () { ( window.plausible.q = window.plausible.q || [] ).push(arguments); };</script>
+        @endproduction
 
         @vite
         @inertiaHead

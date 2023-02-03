@@ -1,22 +1,18 @@
 import appSetup from '@/scripts/helpers/appSetup';
+import { renderToString } from '@vue/server-renderer';
+import createServer from '@inertiajs/server';
 import { createInertiaApp } from '@inertiajs/inertia-vue3';
-import { InertiaProgress } from '@inertiajs/progress';
 import { resolvePageComponent } from 'vite-plugin-laravel/inertia';
 
 /**
- * Initialize inertia app and helpers.
+ * Initialize ssr inertia app.
  * - - - - - - - - - - - - - - - - - - */
 
-InertiaProgress.init({
-    delay:       0,
-    color:       '#5bf4db',
-    includeCSS:  true,
-    showSpinner: true,
-});
-
-const app = createInertiaApp({
+const app = createServer((page) => createInertiaApp({
+    page,
+    render:  renderToString,
     resolve: (name) => resolvePageComponent(name,
           import.meta.glob('@/views/pages/**/*.vue')),
     setup:   ({ el, app, props, plugin }) => appSetup(
           { el, app, props, plugin }),
-});
+}));

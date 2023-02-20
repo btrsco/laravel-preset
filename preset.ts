@@ -34,8 +34,6 @@ export default definePreset({
                         'barryvdh/laravel-debugbar',
                         'barryvdh/laravel-ide-helper',
                         'laravel/breeze',
-                        'pestphp/pest',
-                        'pestphp/pest-plugin-laravel',
                     ],
                     dev: true,
                     additionalArgs: [

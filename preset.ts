@@ -21,6 +21,9 @@ export default definePreset({
                         'tightenco/ziggy',
                     ],
                     dev: false,
+                    additionalArgs: [
+                        '--no-cache',
+                    ],
                 });
 
                 // Install composer dev dependencies
@@ -35,6 +38,9 @@ export default definePreset({
                         'pestphp/pest-plugin-laravel',
                     ],
                     dev: true,
+                    additionalArgs: [
+                        '--no-cache',
+                    ],
                 });
 
                 // Install node dependencies

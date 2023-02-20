@@ -21,6 +21,9 @@ export default definePreset({
                         'tightenco/ziggy',
                     ],
                     dev: false,
+                    additionalArgs: [
+                        '--no-cache',
+                    ],
                 });
 
                 // Install composer dev dependencies
@@ -35,6 +38,9 @@ export default definePreset({
                         'pestphp/pest-plugin-laravel',
                     ],
                     dev: true,
+                    additionalArgs: [
+                        '--no-cache',
+                    ],
                 });
 
                 // Install node dependencies
@@ -46,6 +52,8 @@ export default definePreset({
                         '@inertiajs/inertia',
                         '@inertiajs/inertia-vue3',
                         '@inertiajs/progress',
+                        '@inertiajs/server',
+                        '@vue/server-renderer',
                         'alea-generator',
                         'dayjs',
                         'lodash',
@@ -161,6 +169,8 @@ export default definePreset({
                         'build',
                     ],
                 });
+
+                // TODO: Handle running migrations before building model helpers
 
                 // Generate phpstorm meta helper files
                 await executeCommand({

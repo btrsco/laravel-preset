@@ -12,8 +12,8 @@ createServer((page) =>
     render: renderToString,
     title: (title) => `${ title } - ${ appName }`,
     resolve: (name) => resolvePageComponent(
-      `@/views/pages/${ name }.vue`,
-      import.meta.glob('@/views/pages/**/*.vue'),
+      `/resources/views/pages/${ name }.vue`,
+      import.meta.glob('/resources/views/pages/**/*.vue'),
     ),
     setup: ({ App, props, plugin }) => appSetup({ App, props, plugin, page }),
     progress: { color: '#4b5563' },

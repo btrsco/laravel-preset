@@ -130,16 +130,29 @@ export default definePreset({
                     operations: [
                         {
                             type: 'add-line',
-                            lines: '.DS_Store',
-                            position: 'before',
-                            match: /\.env\n/g,
+                            lines: '_ide_helper_models.php',
+                            position: 11,
                         },
                         {
                             type: 'add-line',
-                            lines: 'storage/debugbar',
-                            position: 'after',
-                            match: /\/storage\/\*.key\n/g,
-                        }
+                            lines: '_ide_helper.php',
+                            position: 11,
+                        },
+                        {
+                            type: 'add-line',
+                            lines: '.phpstorm.meta.php',
+                            position: 11,
+                        },
+                        {
+                            type: 'add-line',
+                            lines: '.DS_Store',
+                            position: 7,
+                        },
+                        {
+                            type: 'add-line',
+                            lines: '/storage/debugbar',
+                            position: 6,
+                        },
                     ],
                 });
 
@@ -217,6 +230,7 @@ export default definePreset({
                         'app/Http/Controllers/Auth/AuthenticatedSessionController.php',
                         'app/Http/Controllers/Auth/NewPasswordController.php',
                         'app/Http/Middleware/HandleInertiaRequests.php',
+                        'resources/css',
                         'resources/js/app.js',
                         'resources/js/bootstrap.js',
                         'resources/js/ssr.js',

@@ -12,6 +12,12 @@
 <br />
 
 <div align="center">
+  If you want to migrate and/or seed your database, the following flags are available: <code>--migrate</code> and <code>--seed</code>. 
+</div>
+
+<br />
+
+<div align="center">
   This preset was made by @btrsco.
   <br />
   <br />

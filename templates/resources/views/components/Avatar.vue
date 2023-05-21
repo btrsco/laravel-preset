@@ -26,9 +26,9 @@
 <script>
 import { BACKGROUND_COLORS, SHAPE_COLORS, TEXT_COLORS } from '@/scripts/helpers/definitions/avatarColors';
 import { random } from '@/scripts/helpers/random';
-import avatarImage from '@/views/components/avatar/avatarImage';
-import avatarShape from '@/views/components/avatar/avatarShape';
-import avatarText from '@/views/components/avatar/avatarText';
+import avatarImage from '@/views/components/avatar/AvatarImage';
+import avatarShape from '@/views/components/avatar/AvatarShape';
+import avatarText from '@/views/components/avatar/AvatarText';
 
 export default {
     name:       'avatar',

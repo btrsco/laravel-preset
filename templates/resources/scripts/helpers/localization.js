@@ -7,85 +7,87 @@
  * @returns {null|*}
  * @private
  */
-export function __(key = null, replace = null, locale = 'en') {
-    if (key === null) {
-        return key;
-    }
+export function __ (key = null, replace = null, locale = null) {
 
-    locale               = locale ? locale : window.page.props.app.locale;
-    let messages         = window.page.props.lang[ locale ];
-    let fallbackMessages = window.page.props.lang.fallback;
-
-    if (messages.hasOwnProperty(key)) {
-        if (replace === null) {
-            return messages[ key ];
-        }
-        return makeReplacements(messages[ key ], replace);
-    }
-    else if (fallbackMessages.hasOwnProperty(key)) {
-        if (replace === null) {
-            return fallbackMessages[ key ];
-        }
-        return makeReplacements(fallbackMessages[ key ], replace);
-    }
-
-    return key;
-}
-
-/**
- * Generate all possible variable replacements,
- * then replace if found.
- *
- * @param line
- * @param replace
- * @returns {*}
- */
-function makeReplacements(line, replace) {
+  /**
+   * Generate all possible variable replacements,
+   * then replace if found.
+   *
+   * @param line
+   * @param replace
+   * @returns {*}
+   */
+  let makeReplacements = function (line, replace) {
     if (replace.length === 0) {
-        return line;
+      return line;
     }
 
     let shouldReplace = {};
 
     for (let [key, value] of Object.entries(replace)) {
-        shouldReplace[ ':' + ucfirst(key ?? '') ] = ucfirst(value ?? '');
-        shouldReplace[ ':' + upper(key ?? '') ]   = upper(value ?? '');
-        shouldReplace[ ':' + key ]                = value;
+      shouldReplace[ ':' + upperCaseFirst(key ?? '') ] = upperCaseFirst(
+        value ?? '');
+      shouldReplace[ ':' + upperCaseAll(key ?? '') ] = upperCaseAll(
+        value ?? '');
+      shouldReplace[ ':' + key ] = value;
     }
 
-    return strtr(line, shouldReplace);
-}
+    return replacePairs(line, shouldReplace);
+  };
 
-/**
- * Convert string to all uppercase.
- *
- * @param string
- * @returns {string}
- */
-function upper(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+  /**
+   * Convert string to all uppercase.
+   *
+   * @param string
+   * @returns {string}
+   */
+  let upperCaseAll = function (string) {
+    return typeof string === 'string'
+      ? string.toUpperCase()
+      : string;
+  };
 
-/**
- * Convert first letter of string to uppercase.
- *
- * @param string
- * @returns {string}
- */
-function ucfirst(string) {
-    return string.toUpperCase();
-}
+  /**
+   * Convert first letter of string to uppercase.
+   *
+   * @param string
+   * @returns {string}
+   */
+  let upperCaseFirst = function (string) {
+    return typeof string === 'string'
+      ? string.charAt(0).toUpperCase() + string.slice(1)
+      : string;
+  };
 
-/**
- * Translate certain characters based on pairs.
- *
- * @param string
- * @param replacePairs
- * @returns {*}
- */
-function strtr(string, replacePairs) {
+  /**
+   * Translate certain characters based on pairs.
+   *
+   * @param string
+   * @param replacePairs
+   * @returns {*}
+   */
+  let replacePairs = function (string, replacePairs) {
     for (let [key, value] of Object.entries(replacePairs)) {
-        string = string.replace(new RegExp(key, 'g'), value);
+      string = string.replace(new RegExp(key, 'g'), value);
     }
     return string;
+  };
+
+  if (key === null || typeof Localization === 'undefined') {
+    return replace !== null ? makeReplacements(key, replace) : key;
+  }
+
+  const currentLocale = locale || Localization.locale;
+  const fallbackLocale = Localization.fallback_locale;
+  const messages = Localization.messages[ currentLocale ];
+  const fallbackMessages = Localization.messages[ fallbackLocale ];
+  const targetMessages = messages.hasOwnProperty(key)
+    ? messages
+    : fallbackMessages;
+
+  return replace !== null && targetMessages[ key ]
+    ? makeReplacements(targetMessages[ key ], replace)
+    : replace !== null
+      ? makeReplacements(key, replace)
+      : key;
 }

@@ -2,65 +2,45 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Application;
+use App\Services\Localization;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tightenco\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
     /**
-     * The root template that's loaded on the first page visit.
+     * The root template that is loaded on the first page visit.
      *
-     * @see https://inertiajs.com/server-side-setup#root-template
      * @var string
      */
     protected $rootView = 'app';
 
     /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     *
-     * @param Request $request
-     *
-     * @return string|null
+     * Determine the current asset version.
      */
-    public function version(Request $request): ?string
+    public function version(Request $request): string|null
     {
-        return vite()->getHash();
+        return parent::version($request);
     }
 
     /**
-     * Defines the props that are shared by default.
+     * Define the props that are shared by default.
      *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @param Request $request
-     *
-     * @return array
+     * @return array<string, mixed>
      */
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            'app'       => [
-                'name'     => config('app.name'),
-                'timezone' => config('app.timezone'),
-                'locale'   => config('app.locale'),
-                'meta'     => config('meta'),
+            'auth' => [
+                'user' => $request->user(),
             ],
-            'auth.user' => fn() => $request->user()
-                ? $request->user()
-                    ->only('id', 'name', 'email')
-                : null,
-            'flash'     => [
-                'message' => fn() => $request->session()->get('message'),
-                'success' => fn() => $request->session()->get('success'),
-                'warning' => fn() => $request->session()->get('warning'),
-            ],
-            'versions'  => [
-                'php'     => PHP_VERSION,
-                'laravel' => Application::VERSION,
-            ],
+            'ziggy' => function () use ($request) {
+                return array_merge((new Ziggy)->toArray(), [
+                    'location' => $request->url(),
+                ]);
+            },
+            'localization' => (new Localization)->toArray(),
         ]);
     }
 }

@@ -1,20 +1,21 @@
-import appSetup from '@/scripts/helpers/appSetup';
-import defaultLayout from '@/views/layouts/defaultLayout';
 import { renderToString } from '@vue/server-renderer';
-import createServer from '@inertiajs/server';
-import { createInertiaApp } from '@inertiajs/inertia-vue3';
-import { resolvePageComponent } from 'vite-plugin-laravel/inertia';
+import { createInertiaApp } from '@inertiajs/vue3';
+import createServer from '@inertiajs/vue3/server';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import appSetup from '@/scripts/helpers/appSetup';
 
-/**
- * Initialize ssr inertia app.
- * - - - - - - - - - - - - - - - - - - */
+const appName = import.meta.env.VITE_APP_NAME;
 
-const app = createServer((page) => createInertiaApp({
+createServer((page) =>
+  createInertiaApp({
     page,
-    render:  renderToString,
-    resolve: (name) => resolvePageComponent(name,
-          import.meta.glob('@/views/pages/**/*.vue'),
-          defaultLayout),
-    setup:   ({ el, app, props, plugin }) => appSetup(
-          { el, app, props, plugin }),
-}));
+    render: renderToString,
+    title: (title) => `${ title } - ${ appName }`,
+    resolve: (name) => resolvePageComponent(
+      `@/views/pages/${ name }.vue`,
+      import.meta.glob('@/views/pages/**/*.vue'),
+    ),
+    setup: ({ App, props, plugin }) => appSetup({ App, props, plugin, page }),
+    progress: { color: '#4b5563' },
+  }),
+);

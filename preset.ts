@@ -197,18 +197,6 @@ export default definePreset({
             handler: async () => {
                 await sleep(1000);
                 await editFiles({
-                    title: 'modify .gitignore',
-                    files: '.gitignore',
-                    operations: [
-                        {
-                            type: 'remove-line',
-                            match: /\/bootstrap\/ssr\n/g,
-                        }
-                    ],
-                });
-
-                await sleep(1000);
-                await editFiles({
                     title: 'modify jsconfig.json',
                     files: 'jsconfig.json',
                     operations: [

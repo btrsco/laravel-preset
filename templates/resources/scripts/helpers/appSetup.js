@@ -4,8 +4,10 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import PortalVue, { Portal, PortalTarget } from 'portal-vue';
 import { createApp, createSSRApp, h } from 'vue';
-
 import { ZiggyVue } from 'ZiggyVue';
+
+import Avatar from '@/views/components/Avatar.vue';
+import Icon from '@/views/components/Icon.vue';
 
 /**
  * Initialize inertia app and helpers.
@@ -45,6 +47,9 @@ export default function ({ el, App, props, plugin, page }) {
 
   vueApp.component('portal', Portal);
   vueApp.component('portal-target', PortalTarget);
+
+  vueApp.component('avatar', Avatar);
+  vueApp.component('icon', Icon);
 
   /**
    * Mount app to element and window.

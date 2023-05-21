@@ -131,7 +131,14 @@ export default definePreset({
                         {
                             type: 'add-line',
                             lines: '.DS_Store',
-                            position: 7,
+                            position: 'before',
+                            match: /\.env\n/g,
+                        },
+                        {
+                            type: 'add-line',
+                            lines: 'storage/debugbar',
+                            position: 'after',
+                            match: /\/storage\/\*.key\n/g,
                         }
                     ],
                 });
@@ -188,18 +195,6 @@ export default definePreset({
         await group({
             title: 'modify laravel breeze',
             handler: async () => {
-                await sleep(1000);
-                await editFiles({
-                    title: 'modify .gitignore',
-                    files: '.gitignore',
-                    operations: [
-                        {
-                            type: 'remove-line',
-                            match: /\/bootstrap\/ssr\n/g,
-                        }
-                    ],
-                });
-
                 await sleep(1000);
                 await editFiles({
                     title: 'modify jsconfig.json',

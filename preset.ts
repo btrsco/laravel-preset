@@ -5,6 +5,7 @@ export default definePreset({
     options: {
         migrate: false,
         seed: false,
+        docker: true,
     },
     postInstall: ({hl}) => [
         `Run the development server with ${hl('npm run dev')}`,
@@ -340,21 +341,94 @@ export default definePreset({
                         }
                     ],
                 });
+
+                await editFiles({
+                    title: 'modify package.json',
+                    files: 'package.json',
+                    operations: [
+                        {
+                            type: 'edit-json',
+                            replace: (json, omit) => ({
+                                ...json,
+                                scripts: {
+                                    ...json.scripts,
+                                    'dev': 'vite --host',
+                                },
+                            }),
+                        }
+                    ],
+                });
             }
         });
+
+        if (context.options.docker) {
+            await group({
+                title: 'install laravel sail',
+                handler: async () => {
+                    await deletePaths({
+                        title: 'remove dependencies',
+                        paths: [
+                            'vendor',
+                            'node_modules',
+                            'composer.lock',
+                            'package-lock.json',
+                        ],
+                    });
+
+                    await executeCommand({
+                        title: 'publish sail scaffolding',
+                        command: 'php',
+                        arguments: [
+                            'artisan',
+                            'sail:install',
+                            '--quiet',
+                        ],
+                    });
+                },
+            });
+        }
 
         await group({
             title: 'build assets & helpers',
             handler: async () => {
-                await executeCommand({
-                    title: 'build assets',
-                    command: 'npm',
-                    arguments: [
-                        'run',
-                        'build',
-                    ],
-                });
+                if (context.options.docker) {
+                    await executeCommand({
+                        title: 'install composer dependencies within docker',
+                        command: './vendor/bin/sail',
+                        arguments: [
+                            'composer',
+                            'install',
+                        ],
+                    });
 
+                    await executeCommand({
+                        title: 'install npm dependencies within docker',
+                        command: './vendor/bin/sail',
+                        arguments: [
+                            'npm',
+                            'install',
+                        ],
+                    });
+
+                    await executeCommand({
+                        title: 'build assets within docker',
+                        command: './vendor/bin/sail',
+                        arguments: [
+                            'npm',
+                            'run',
+                            'build',
+                        ],
+                    });
+                } else {
+                    await executeCommand({
+                        title: 'build assets',
+                        command: 'npm',
+                        arguments: [
+                            'run',
+                            'build',
+                        ],
+                    });
+                }
 
                 await executeCommand({
                     title: 'generate phpstorm meta helper files',

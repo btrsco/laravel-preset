@@ -4,8 +4,8 @@
 > sentences. It should be clear what the project is and what it does. It should
 > also include any relevant links to the project.
 
-Access the live site at [example.com](https://example.com) or access the staging
-site at [staging.example.com](https://staging.example.com).
+Access the live site at [project.name](https://project.name) or access the staging
+site at [staging.project.name](https://staging.project.name).
 
 ## Table of Contents
 
@@ -15,6 +15,7 @@ site at [staging.example.com](https://staging.example.com).
 * [Getting Started](#getting-started)
   * [Installation](#installation)
   * [Database Seeding](#database-seeding)
+  * [Docker](#docker)
 * [Code Overview](#code-overview)
   * [Dependencies](#dependencies)
   * [Structure](#structure)
@@ -32,9 +33,14 @@ this project.
 
 ## Installation
 
-Please check the
-official [Laravel 10 documentation](https://laravel.com/docs/10.x/)
-for an installation guide with the server requirements before you get started.
+Please check the official
+[Laravel 10 documentation](laravel-docs) for an installation
+guide with the server requirements before you get started.
+
+Alternatively, you can use the [Laravel Sail Docker containerization](#docker)
+support to run the project, instead of relying on local dependencies. Please
+check the official
+[Laravel Sail documentation](sail-docs).
 
 Clone the repository:
 
@@ -104,12 +110,24 @@ following command:
 php artisan migrate:fresh --seed
 ```
 
+## Docker
+
+You can use [Laravel Sail](sail-docs) to run the project in a Docker container.
+Unfortunately, Laravel Valet conflicts with Laravel Sail, so you will need to
+stop Valet before running Sail.
+
+Run the following command to start the container:
+
+```shell
+./vendor/bin/sail up
+```
+
 # Code Overview
 
 The following is an overview of the code structure. The structure follows the
 Laravel best practices and has been optimized to be as simple as possible. If
 you are not familiar with some terms used below, you can read more about them
-in the [Laravel 10 documentation](https://laravel.com/docs/10.x/) or the
+in the [Laravel 10 documentation](laravel-docs) or the
 specific documentation for the dependencies listed below.
 
 ---
@@ -119,22 +137,15 @@ specific documentation for the dependencies listed below.
 All of our current dependencies are listed below. You can find out more about
 each of these dependencies by clicking on the links below.
 
-- [`laravel/nova`](https://nova.laravel.com/docs/4.0/installation.html): Admin
-  panel for Laravel
-- [`laravel/breeze`](https://laravel.com/docs/10.x/starter-kits#laravel-breeze):
-  Simple authentication scaffolding
-- [`tightenco/ziggy`](https://github.com/tighten/ziggy): Usable routes in
-  Javascript
-- [`lorisleiva/laravel-actions`](https://laravelactions.com/): Classes that
-  handle a specific task
-- [`barryvdh/laravel-debugbar`](https://github.com/barryvdh/laravel-debugbar):
-  Handy debug console for Laravel
-- [`barryvdh/laravel-ide-helper`](https://github.com/barryvdh/laravel-ide-helper):
-  IDE helper file generator
-- [`laravel/pint`](https://laravel.com/docs/10.x/pint): PHP code style fixer
-- [`laravel/sail`](https://laravel.com/docs/10.x/sail): Docker containerization
-  support
-- [`pestphp/pest`](https://pestphp.com/docs/installation): Minimal PHP testing
+- [`laravel/nova`](nova-docs): Admin panel for Laravel
+- [`laravel/breeze`](breeze-docs): Simple authentication scaffolding
+- [`tightenco/ziggy`](ziggy-docs): Usable routes in Javascript
+- [`lorisleiva/laravel-actions`](actions-docs): Classes that handle actions
+- [`barryvdh/laravel-debugbar`](debugbar-docs): Handy debug console for Laravel
+- [`barryvdh/laravel-ide-helper`](ide-helper-docs): IDE helper file generator
+- [`laravel/pint`](pint-docs): PHP code style fixer
+- [`laravel/sail`](sail-docs): Docker containerization support
+- [`pestphp/pest`](pest-docs): Minimal PHP testing
   suite
 
 ## Structure
@@ -184,3 +195,14 @@ We use Pest for testing. You can run the tests with the following command:
 ```shell
 ./vendor/bin/pest
 ```
+
+[actions-docs]: https://laravelactions.com/
+[breeze-docs]: https://laravel.com/docs/10.x/starter-kits#laravel-breeze
+[debugbar-docs]: https://github.com/barryvdh/laravel-debugbar
+[ide-helper-docs]: https://github.com/barryvdh/laravel-ide-helper
+[laravel-docs]: https://laravel.com/docs/10.x
+[nova-docs]: https://nova.laravel.com/docs/4.0/installation.html
+[pest-docs]: https://pestphp.com/docs/installation
+[pint-docs]: https://laravel.com/docs/10.x/pint
+[sail-docs]: https://laravel.com/docs/10.x/sail
+[ziggy-docs]: https://github.com/tighten/ziggy

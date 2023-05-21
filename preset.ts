@@ -1,9 +1,4 @@
-import {editFiles, executeCommand, group, renamePaths} from "@preset/core";
-
-function sleep(ms) {
-    return;
-    // return new Promise(resolve => setTimeout(resolve, ms));
-}
+import {deletePaths, editFiles, executeCommand, group, renamePaths} from "@preset/core";
 
 export default definePreset({
     name: 'laravel-preset',
@@ -11,7 +6,7 @@ export default definePreset({
         migrate: false,
         seed: false,
     },
-    postInstall: ({ hl }) => [
+    postInstall: ({hl}) => [
         `Run the development server with ${hl('npm run dev')}`,
         `Edit your scripts in ${hl('resources/scripts')}`,
         `Edit your pages and components in ${hl('resources/views')}`,
@@ -21,7 +16,6 @@ export default definePreset({
         await group({
             title: 'install composer dependencies',
             handler: async () => {
-                await sleep(1000);
                 await editFiles({
                     title: 'modify composer.json',
                     files: 'composer.json',
@@ -49,7 +43,6 @@ export default definePreset({
                     ]
                 });
 
-                await sleep(1000);
                 await installPackages({
                     title: 'install composer dependencies',
                     for: 'php',
@@ -58,6 +51,7 @@ export default definePreset({
                         'spatie/laravel-collection-macros',
                         'eminiarts/nova-tabs',
                         'outofoffice/password-generator',
+                        'lorisleiva/laravel-actions',
                     ],
                     dev: false,
                     additionalArgs: [
@@ -65,7 +59,6 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await installPackages({
                     title: 'install composer dev dependencies',
                     for: 'php',
@@ -84,7 +77,6 @@ export default definePreset({
         await group({
             title: 'install npm dependencies',
             handler: async () => {
-                await sleep(1000);
                 await installPackages({
                     title: 'install node dependencies',
                     for: 'node',
@@ -101,7 +93,6 @@ export default definePreset({
                     dev: false,
                 });
 
-                await sleep(1000);
                 await installPackages({
                     title: 'install node dev dependencies',
                     for: 'node',
@@ -123,7 +114,6 @@ export default definePreset({
         await group({
             title: 'modify base laravel install',
             handler: async () => {
-                await sleep(1000);
                 await editFiles({
                     title: 'modify .gitignore',
                     files: '.gitignore',
@@ -156,7 +146,6 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await editFiles({
                     title: 'modify .env',
                     files: ['.env', '.env.example'],
@@ -169,13 +158,17 @@ export default definePreset({
                         },
                     ],
                 });
+
+                await deletePaths({
+                    title: 'remove default readme.md',
+                    paths: ['readme.md'],
+                })
             },
         });
 
         await group({
             title: 'initialize laravel breeze',
             handler: async () => {
-                await sleep(1000);
                 await executeCommand({
                     title: 'initialize laravel breeze',
                     command: 'php',
@@ -193,7 +186,6 @@ export default definePreset({
         await group({
             title: 'initialize laravel nova',
             handler: async () => {
-                await sleep(1000);
                 await executeCommand({
                     title: 'initialize laravel nova',
                     command: 'php',
@@ -208,7 +200,6 @@ export default definePreset({
         await group({
             title: 'modify laravel breeze',
             handler: async () => {
-                await sleep(1000);
                 await editFiles({
                     title: 'modify jsconfig.json',
                     files: 'jsconfig.json',
@@ -223,7 +214,6 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await deletePaths({
                     title: 'remove default scaffolding',
                     paths: [
@@ -239,14 +229,12 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await renamePaths({
                     title: 'rename resources/js to resources/views',
                     paths: 'resources/js',
                     transformer: (path) => path.base.replace('js', 'views'),
                 });
 
-                await sleep(1000);
                 await renamePaths({
                     title: 'rename directories to lower case',
                     paths: [
@@ -257,7 +245,6 @@ export default definePreset({
                     transformer: (path) => path.base.toLowerCase(),
                 });
 
-                await sleep(1000);
                 await editFiles({
                     title: 'fix component imports',
                     files: [
@@ -289,7 +276,6 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await editFiles({
                     title: 'fix resource paths in tailwind.config.js',
                     files: 'tailwind.config.js',
@@ -310,7 +296,6 @@ export default definePreset({
         await group({
             title: 'modify laravel nova',
             handler: async () => {
-                await sleep(1000);
                 await deletePaths({
                     title: 'remove default scaffolding',
                     paths: [
@@ -323,7 +308,6 @@ export default definePreset({
         await group({
             title: 'extract preset files',
             handler: async () => {
-                await sleep(1000);
                 await deletePaths({
                     title: 'remove files to replace with preset files',
                     paths: [
@@ -339,14 +323,12 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await extractTemplates({
                     title: 'extract preset files',
                     from: './',
                     to: './',
                 });
 
-                await sleep(1000);
                 await editFiles({
                     title: 'modify config/app.php',
                     files: 'config/app.php',
@@ -364,7 +346,6 @@ export default definePreset({
         await group({
             title: 'build assets & helpers',
             handler: async () => {
-                await sleep(1000);
                 await executeCommand({
                     title: 'build assets',
                     command: 'npm',
@@ -375,7 +356,6 @@ export default definePreset({
                 });
 
 
-                await sleep(1000);
                 await executeCommand({
                     title: 'generate phpstorm meta helper files',
                     command: 'php',
@@ -385,7 +365,6 @@ export default definePreset({
                     ],
                 });
 
-                await sleep(1000);
                 await executeCommand({
                     title: 'generate phpstorm ide helper files',
                     command: 'php',
@@ -397,7 +376,6 @@ export default definePreset({
                 });
 
                 if (context.options.migrate) {
-                    await sleep(1000);
                     let options = ['--force'];
 
                     if (context.options.seed) options.push('--seed');
@@ -412,7 +390,6 @@ export default definePreset({
                         ],
                     });
 
-                    await sleep(1000);
                     await executeCommand({
                         title: 'generate phpstorm ide models helper files',
                         command: 'php',

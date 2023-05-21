@@ -26,7 +26,7 @@ export default function ({ el, App, props, plugin, page }) {
     : createApp({ render: () => h(App, props) });
 
   vueApp.mixin({
-    methods: { dayjs },
+    methods: { __, dayjs },
   });
 
   vueApp.use(ZiggyVue, page !== undefined ? {

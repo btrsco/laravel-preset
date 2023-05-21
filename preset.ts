@@ -131,7 +131,14 @@ export default definePreset({
                         {
                             type: 'add-line',
                             lines: '.DS_Store',
-                            position: 7,
+                            position: 'before',
+                            match: /\.env\n/g,
+                        },
+                        {
+                            type: 'add-line',
+                            lines: 'storage/debugbar',
+                            position: 'after',
+                            match: /\/storage\/\*.key\n/g,
                         }
                     ],
                 });

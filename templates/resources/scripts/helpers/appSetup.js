@@ -1,19 +1,11 @@
-import { createApp, h } from 'vue';
-import { Link, Head } from '@inertiajs/inertia-vue3';
-import { InertiaProgress } from '@inertiajs/progress';
-
-import route from 'ziggy-js';
-import { ZiggyVue } from 'ziggy';
-import { Ziggy } from '@/scripts/helpers/ziggy';
-import PortalVue, { Portal, PortalTarget } from 'portal-vue';
+import { Head, Link } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { __ } from '@/scripts/helpers/localization';
+import utc from 'dayjs/plugin/utc';
+import PortalVue, { Portal, PortalTarget } from 'portal-vue';
+import { createApp, createSSRApp, h } from 'vue';
 
-import pageHead from '@/views/components/utils/pageHead';
-import avatar from '@/views/components/avatar';
-import icon from '@/views/components/icon';
+import { ZiggyVue } from 'ZiggyVue';
 
 /**
  * Initialize inertia app and helpers.
@@ -22,57 +14,43 @@ import icon from '@/views/components/icon';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-InertiaProgress.init({
-    delay: 0, color: '#63cdee', includeCSS: true, showSpinner: true,
-});
+export default function ({ el, App, props, plugin, page }) {
+  /**
+   * Initialize app, helpers and mixins.
+   * - - - - - - - - - - - - - - - - - - */
 
-export default function ({ el, app, props, plugin }) {
-    /**
-     * Initialize app, helpers and mixins.
-     * - - - - - - - - - - - - - - - - - - */
+  let vueApp = page !== undefined
+    ? createSSRApp({ render: () => h(App, props) })
+    : createApp({ render: () => h(App, props) });
 
-    const vueApp = createApp({ render: () => h(app, props) });
+  vueApp.mixin({
+    methods: { dayjs },
+  });
 
-    vueApp.mixin({
-        methods: { route, dayjs, __ },
-    });
+  vueApp.use(ZiggyVue, page !== undefined ? {
+      ...page.props.ziggy,
+      url: new URL(page.props.ziggy.location),
+    } : Ziggy,
+  );
 
-    Object.keys(Ziggy.routes).forEach((key) => {
-        if (!Ziggy.routes[ key ].hasOwnProperty('domain')) {
-            Ziggy.routes[ key ].domain = location.hostname;
-        }
-    });
+  vueApp.use(PortalVue);
+  vueApp.use(plugin);
 
-    vueApp.use(ZiggyVue, Ziggy);
-    vueApp.use(PortalVue);
-    vueApp.use(plugin);
+  /**
+   * Register global vue components.
+   * - - - - - - - - - - - - - - - - - - */
 
-    /**
-     * Register global vue helpers.
-     * - - - - - - - - - - - - - - - - - - */
+  vueApp.component('inertia-link', Link);
+  vueApp.component('inertia-head', Head);
 
-    // vueApp.config.globalProperties.bus = bus;
+  vueApp.component('portal', Portal);
+  vueApp.component('portal-target', PortalTarget);
 
-    /**
-     * Register global vue components.
-     * - - - - - - - - - - - - - - - - - - */
+  /**
+   * Mount app to element and window.
+   * - - - - - - - - - - - - - - - - - - */
 
-    vueApp.component( 'inertia-link', Link );
-    vueApp.component( 'inertia-head', Head );
+  if (el) vueApp.mount(el);
 
-    vueApp.component('page-head', pageHead);
-
-    vueApp.component('portal', Portal);
-    vueApp.component('portal-target', PortalTarget);
-
-    vueApp.component('avatar', avatar);
-    vueApp.component('icon', icon);
-
-    /**
-     * Mount app to element and window.
-     * - - - - - - - - - - - - - - - - - - */
-
-    vueApp.mount(el);
-
-    return vueApp;
+  return vueApp;
 }

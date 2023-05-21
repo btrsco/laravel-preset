@@ -1,24 +1,63 @@
-import {group} from "@preset/core";
+import {editFiles, executeCommand, group, renamePaths} from "@preset/core";
+
+function sleep(ms) {
+    return;
+    // return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export default definePreset({
     name: 'laravel-preset',
     options: {
-        // ...
+        migrate: false,
+        seed: false,
     },
-    handler: async () => {
+    postInstall: ({ hl }) => [
+        `Run the development server with ${hl('npm run dev')}`,
+        `Edit your scripts in ${hl('resources/scripts')}`,
+        `Edit your pages and components in ${hl('resources/views')}`,
+        `Build for production with ${hl('npm run build')}`,
+    ],
+    handler: async (context) => {
         await group({
-            title: 'install dependencies',
+            title: 'install composer dependencies',
             handler: async () => {
-                // Install composer dependencies
+                await sleep(1000);
+                await editFiles({
+                    title: 'modify composer.json',
+                    files: 'composer.json',
+                    operations: [
+                        {
+                            type: 'edit-json',
+                            replace: (json, omit) => ({
+                                ...json,
+                                require: {
+                                    ...json.require,
+                                    'laravel/nova': '~4.0',
+                                },
+                                repositories: {
+                                    ...json.repositories,
+                                    'laravel/nova': {
+                                        type: "composer",
+                                        url: "https://nova.laravel.com"
+                                    }
+                                },
+                                files: [
+                                    'app/Helpers/Global.php',
+                                ],
+                            }),
+                        }
+                    ]
+                });
+
+                await sleep(1000);
                 await installPackages({
                     title: 'install composer dependencies',
                     for: 'php',
                     packages: [
-                        'inertiajs/inertia-laravel',
-                        'innocenzi/laravel-vite',
+                        'laravel/breeze',
                         'spatie/laravel-collection-macros',
-                        'spatie/laravel-ray',
-                        'tightenco/ziggy',
+                        'eminiarts/nova-tabs',
+                        'outofoffice/password-generator',
                     ],
                     dev: false,
                     additionalArgs: [
@@ -26,32 +65,30 @@ export default definePreset({
                     ],
                 });
 
-                // Install composer dev dependencies
+                await sleep(1000);
                 await installPackages({
                     title: 'install composer dev dependencies',
                     for: 'php',
                     packages: [
                         'barryvdh/laravel-debugbar',
                         'barryvdh/laravel-ide-helper',
-                        'laravel/breeze',
                     ],
                     dev: true,
                     additionalArgs: [
                         '--no-cache',
                     ],
                 });
+            }
+        });
 
-                // Install node dependencies
+        await group({
+            title: 'install npm dependencies',
+            handler: async () => {
+                await sleep(1000);
                 await installPackages({
                     title: 'install node dependencies',
                     for: 'node',
                     packages: [
-                        '@headlessui/vue',
-                        '@inertiajs/inertia',
-                        '@inertiajs/inertia-vue3',
-                        '@inertiajs/progress',
-                        '@inertiajs/server',
-                        '@vue/server-renderer',
                         'alea-generator',
                         'dayjs',
                         'lodash',
@@ -64,14 +101,12 @@ export default definePreset({
                     dev: false,
                 });
 
-                // Install node dev dependencies
+                await sleep(1000);
                 await installPackages({
                     title: 'install node dev dependencies',
                     for: 'node',
                     packages: [
                         '@tailwindcss/line-clamp',
-                        '@vitejs/plugin-vue',
-                        '@vue/compiler-sfc',
                         'alpinejs',
                         'autoprefixer',
                         'laravel-vite-plugin',
@@ -86,62 +121,233 @@ export default definePreset({
         });
 
         await group({
-            title: 'initialize laravel breeze',
+            title: 'modify base laravel install',
             handler: async () => {
-                // Initialize Laravel Breeze
-                await executeCommand({
-                    command: 'php',
-                    arguments: [
-                        'artisan',
-                        'breeze:install',
-                        'blade',
+                await sleep(1000);
+                await editFiles({
+                    title: 'modify .gitignore',
+                    files: '.gitignore',
+                    operations: [
+                        {
+                            type: 'add-line',
+                            lines: '.DS_Store',
+                            position: 7,
+                        }
                     ],
                 });
 
-                // Remove the default Laravel auth scaffolding
-                await deletePaths({
-                    title: 'remove default auth scaffolding',
-                    paths: [
-                        'app/Http/View',
-                        'app/resources/css',
-                        'app/resources/js',
-                        'app/resources/views',
-                        'app/tests/Feature/ProfileTest.php',
+                await sleep(1000);
+                await editFiles({
+                    title: 'modify .env',
+                    files: ['.env', '.env.example'],
+                    operations: [
+                        {
+                            type: 'update-content',
+                            update: (content) => {
+                                return content + '\n\nVITE_APP_NAME="\${APP_NAME}"';
+                            }
+                        },
                     ],
                 });
             },
         });
 
         await group({
-            title: 'laravel inertia scaffolding',
+            title: 'initialize laravel breeze',
             handler: async () => {
-                // Apply the Laravel Inertia scaffolding
-                await applyNestedPreset({
-                    title: 'install laravel:inertia',
-                    preset: 'laravel:inertia'
-                });
-
-                // Remove the default Laravel Inertia scaffolding
-                await deletePaths({
-                    title: 'remove default laravel:inertia scaffolding',
-                    paths: [
-                        'vite.config.ts',
-                        'tsconfig.json',
-                        'resources/views',
-                        'resources/scripts',
-                        'resources/css',
+                await sleep(1000);
+                await executeCommand({
+                    title: 'initialize laravel breeze',
+                    command: 'php',
+                    arguments: [
+                        'artisan',
+                        'breeze:install',
+                        'vue',
+                        '--pest',
+                        '--ssr',
                     ],
                 });
-            }
+            },
+        });
+
+        await group({
+            title: 'initialize laravel nova',
+            handler: async () => {
+                await sleep(1000);
+                await executeCommand({
+                    title: 'initialize laravel nova',
+                    command: 'php',
+                    arguments: [
+                        'artisan',
+                        'nova:install',
+                    ],
+                });
+            },
+        });
+
+        await group({
+            title: 'modify laravel breeze',
+            handler: async () => {
+                await sleep(1000);
+                await editFiles({
+                    title: 'modify .gitignore',
+                    files: '.gitignore',
+                    operations: [
+                        {
+                            type: 'remove-line',
+                            match: /\/bootstrap\/ssr\n/g,
+                        }
+                    ],
+                });
+
+                await sleep(1000);
+                await editFiles({
+                    title: 'modify jsconfig.json',
+                    files: 'jsconfig.json',
+                    operations: [
+                        {
+                            type: 'edit-json',
+                            replace: (json, omit) => ({
+                                ...json,
+                                include: 'resources/**/*',
+                            }),
+                        }
+                    ],
+                });
+
+                await sleep(1000);
+                await deletePaths({
+                    title: 'remove default scaffolding',
+                    paths: [
+                        'app/Http/Controllers/Auth/AuthenticatedSessionController.php',
+                        'app/Http/Controllers/Auth/NewPasswordController.php',
+                        'app/Http/Middleware/HandleInertiaRequests.php',
+                        'resources/js/app.js',
+                        'resources/js/bootstrap.js',
+                        'resources/js/ssr.js',
+                        'resources/views',
+                        'vite.config.js',
+                    ],
+                });
+
+                await sleep(1000);
+                await renamePaths({
+                    title: 'rename resources/js to resources/views',
+                    paths: 'resources/js',
+                    transformer: (path) => path.base.replace('js', 'views'),
+                });
+
+                await sleep(1000);
+                await renamePaths({
+                    title: 'rename directories to lower case',
+                    paths: [
+                        'resources/views/Components',
+                        'resources/views/Layouts',
+                        'resources/views/Pages',
+                    ],
+                    transformer: (path) => path.base.toLowerCase(),
+                });
+
+                await sleep(1000);
+                await editFiles({
+                    title: 'fix component imports',
+                    files: [
+                        'resources/views/layouts/AuthenticatedLayout.vue',
+                        'resources/views/layouts/GuestLayout.vue',
+                        'resources/views/pages/Auth/ConfirmPassword.vue',
+                        'resources/views/pages/Auth/ForgotPassword.vue',
+                        'resources/views/pages/Auth/Login.vue',
+                        'resources/views/pages/Auth/Register.vue',
+                        'resources/views/pages/Auth/ResetPassword.vue',
+                        'resources/views/pages/Auth/VerifyEmail.vue',
+                        'resources/views/pages/Dashboard.vue',
+                        'resources/views/pages/Welcome.vue',
+                        'resources/views/pages/Profile/Edit.vue',
+                        'resources/views/pages/Profile/Partials/DeleteUserForm.vue',
+                        'resources/views/pages/Profile/Partials/UpdatePasswordForm.vue',
+                        'resources/views/pages/Profile/Partials/UpdateProfileInformationForm.vue',
+                    ],
+                    operations: [
+                        {
+                            type: 'update-content',
+                            update: (content) => {
+                                content = content.replace(/@\/Components/g, '@/views/components');
+                                content = content.replace(/@\/Layouts/g, '@/views/layouts');
+                                content = content.replace(/@\/Pages/g, '@/views/pages');
+                                return content;
+                            }
+                        }
+                    ],
+                });
+
+                await sleep(1000);
+                await editFiles({
+                    title: 'fix resource paths in tailwind.config.js',
+                    files: 'tailwind.config.js',
+                    operations: [
+                        {
+                            type: 'update-content',
+                            update: (content) => {
+                                content = content.replace(/\.\/resources\/js\/\*\*\/\*\.vue/g, './resources/views/**/*.{php,vue,js}');
+                                content = content.replace(/ {8}'\.\/resources\/views\/\*\*\/\*\.blade\.php',\n/g, '');
+                                return content;
+                            }
+                        }
+                    ]
+                });
+            },
+        });
+
+        await group({
+            title: 'modify laravel nova',
+            handler: async () => {
+                await sleep(1000);
+                await deletePaths({
+                    title: 'remove default scaffolding',
+                    paths: [
+                        'app/Nova/User.php',
+                    ],
+                });
+            },
         });
 
         await group({
             title: 'extract preset files',
             handler: async () => {
-                // Extract preset files to root
+                await sleep(1000);
+                await deletePaths({
+                    title: 'remove files to replace with preset files',
+                    paths: [
+                        'app/Http/Kernel.php',
+                        'app/Models/User.php',
+                        'app/Providers/EventServiceProvider.php',
+                        'database/factories/UserFactory.php',
+                        'database/migrations/2014_10_12_000000_create_users_table.php',
+                        'database/seeders/DatabaseSeeder.php',
+                        'public/robots.txt',
+                        'routes/web.php',
+                        'routes/auth.php',
+                    ],
+                });
+
+                await sleep(1000);
                 await extractTemplates({
+                    title: 'extract preset files',
                     from: './',
                     to: './',
+                });
+
+                await sleep(1000);
+                await editFiles({
+                    title: 'modify config/app.php',
+                    files: 'config/app.php',
+                    operations: [
+                        {
+                            type: 'add-line',
+                            lines: 'App\\Providers\\BladeDirectiveServiceProvider::class,',
+                            position: 170,
+                        }
+                    ],
                 });
             }
         });
@@ -149,18 +355,9 @@ export default definePreset({
         await group({
             title: 'build assets & helpers',
             handler: async () => {
-                // Generate ziggy routes
+                await sleep(1000);
                 await executeCommand({
-                    command: 'php',
-                    arguments: [
-                        'artisan',
-                        'ziggy:generate',
-                        './resources/scripts/helpers/ziggy.js'
-                    ],
-                });
-
-                // Build assets
-                await executeCommand({
+                    title: 'build assets',
                     command: 'npm',
                     arguments: [
                         'run',
@@ -168,10 +365,10 @@ export default definePreset({
                     ],
                 });
 
-                // TODO: Handle running migrations before building model helpers
 
-                // Generate phpstorm meta helper files
+                await sleep(1000);
                 await executeCommand({
+                    title: 'generate phpstorm meta helper files',
                     command: 'php',
                     arguments: [
                         'artisan',
@@ -179,8 +376,9 @@ export default definePreset({
                     ],
                 });
 
-                // Generate ide helper files
+                await sleep(1000);
                 await executeCommand({
+                    title: 'generate phpstorm ide helper files',
                     command: 'php',
                     arguments: [
                         'artisan',
@@ -189,16 +387,33 @@ export default definePreset({
                     ],
                 });
 
-                // Generate ide models helper files
-                await executeCommand({
-                    command: 'php',
-                    arguments: [
-                        'artisan',
-                        'ide-helper:models',
-                        '--write-mixin',
-                        '--reset',
-                    ],
-                });
+                if (context.options.migrate) {
+                    await sleep(1000);
+                    let options = ['--force'];
+
+                    if (context.options.seed) options.push('--seed');
+
+                    await executeCommand({
+                        title: 'run migrations',
+                        command: 'php',
+                        arguments: [
+                            'artisan',
+                            'migrate',
+                            ...options
+                        ],
+                    });
+
+                    await sleep(1000);
+                    await executeCommand({
+                        title: 'generate phpstorm ide models helper files',
+                        command: 'php',
+                        arguments: [
+                            'artisan',
+                            'ide-helper:models',
+                            '--nowrite',
+                        ],
+                    });
+                }
             }
         });
     },

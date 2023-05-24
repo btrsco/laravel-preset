@@ -6,6 +6,7 @@ export default definePreset({
         migrate: false,
         seed: false,
         docker: true,
+        nova: true,
     },
     postInstall: ({hl}) => [
         `Run the development server with ${hl('npm run dev')}`,
@@ -17,43 +18,66 @@ export default definePreset({
         await group({
             title: 'install composer dependencies',
             handler: async () => {
-                await editFiles({
-                    title: 'modify composer.json',
-                    files: 'composer.json',
-                    operations: [
-                        {
-                            type: 'edit-json',
-                            replace: (json, omit) => ({
-                                ...json,
-                                require: {
-                                    ...json.require,
-                                    'laravel/nova': '~4.0',
-                                },
-                                repositories: {
-                                    ...json.repositories,
-                                    'laravel/nova': {
-                                        type: "composer",
-                                        url: "https://nova.laravel.com"
-                                    }
-                                },
-                                files: [
-                                    'app/Helpers/Global.php',
-                                ],
-                            }),
-                        }
-                    ]
-                });
+                if (context.options.nova) {
+                    await editFiles({
+                        title: 'modify composer.json',
+                        files: 'composer.json',
+                        operations: [
+                            {
+                                type: 'edit-json',
+                                replace: (json, omit) => ({
+                                    ...json,
+                                    require: {
+                                        ...json.require,
+                                        'laravel/nova': '~4.0',
+                                    },
+                                    repositories: {
+                                        ...json.repositories,
+                                        'laravel/nova': {
+                                            type: "composer",
+                                            url: "https://nova.laravel.com"
+                                        }
+                                    },
+                                    files: [
+                                        'app/Helpers/Global.php',
+                                    ],
+                                }),
+                            }
+                        ]
+                    });
+                } else {
+                    await editFiles({
+                        title: 'modify composer.json',
+                        files: 'composer.json',
+                        operations: [
+                            {
+                                type: 'edit-json',
+                                replace: (json, omit) => ({
+                                    ...json,
+                                    files: [
+                                        'app/Helpers/Global.php',
+                                    ],
+                                }),
+                            }
+                        ]
+                    });
+                }
+
+                let composerPackages = [
+                    'laravel/breeze',
+                    'spatie/laravel-collection-macros',
+                    'lorisleiva/laravel-actions',
+                ];
+
+                if (context.options.nova) {
+                    composerPackages.push('eminiarts/nova-tabs');
+                    composerPackages.push('outofoffice/password-generator');
+                }
 
                 await installPackages({
                     title: 'install composer dependencies',
                     for: 'php',
-                    packages: [
-                        'laravel/breeze',
-                        'spatie/laravel-collection-macros',
-                        'eminiarts/nova-tabs',
-                        'outofoffice/password-generator',
-                        'lorisleiva/laravel-actions',
-                    ],
+                    packages: composerPackages,
                     dev: false,
                     additionalArgs: [
                         '--no-cache',
@@ -184,19 +208,21 @@ export default definePreset({
             },
         });
 
-        await group({
-            title: 'initialize laravel nova',
-            handler: async () => {
-                await executeCommand({
-                    title: 'initialize laravel nova',
-                    command: 'php',
-                    arguments: [
-                        'artisan',
-                        'nova:install',
-                    ],
-                });
-            },
-        });
+        if (context.options.nova) {
+            await group({
+                title: 'initialize laravel nova',
+                handler: async () => {
+                    await executeCommand({
+                        title: 'initialize laravel nova',
+                        command: 'php',
+                        arguments: [
+                            'artisan',
+                            'nova:install',
+                        ],
+                    });
+                },
+            });
+        }
 
         await group({
             title: 'modify laravel breeze',
@@ -294,17 +320,19 @@ export default definePreset({
             },
         });
 
-        await group({
-            title: 'modify laravel nova',
-            handler: async () => {
-                await deletePaths({
-                    title: 'remove default scaffolding',
-                    paths: [
-                        'app/Nova/User.php',
-                    ],
-                });
-            },
-        });
+        if (context.options.nova) {
+            await group({
+                title: 'modify laravel nova',
+                handler: async () => {
+                    await deletePaths({
+                        title: 'remove default scaffolding',
+                        paths: [
+                            'app/Nova/User.php',
+                        ],
+                    });
+                },
+            });
+        }
 
         await group({
             title: 'extract preset files',
@@ -358,6 +386,13 @@ export default definePreset({
                         }
                     ],
                 });
+
+                if (!context.options.nova) {
+                    await deletePaths({
+                        title: 'remove nova related files',
+                        paths: ['app/Nova'],
+                    });
+                }
             }
         });
 

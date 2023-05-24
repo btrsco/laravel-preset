@@ -1,13 +1,11 @@
-import { Head, Link } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import PortalVue, { Portal, PortalTarget } from 'portal-vue';
+import PortalVue from 'portal-vue';
 import { createApp, createSSRApp, h } from 'vue';
 import { ZiggyVue } from 'ZiggyVue';
 
-import Avatar from '@/views/components/Avatar.vue';
-import Icon from '@/views/components/Icon.vue';
+import Components from '@/scripts/components';
 
 /**
  * Initialize inertia app and helpers.
@@ -26,7 +24,7 @@ export default function ({ el, App, props, plugin, page }) {
     : createApp({ render: () => h(App, props) });
 
   vueApp.mixin({
-    methods: { dayjs },
+    methods: { __, dayjs },
   });
 
   vueApp.use(ZiggyVue, page !== undefined ? {
@@ -36,20 +34,8 @@ export default function ({ el, App, props, plugin, page }) {
   );
 
   vueApp.use(PortalVue);
+  vueApp.use(Components);
   vueApp.use(plugin);
-
-  /**
-   * Register global vue components.
-   * - - - - - - - - - - - - - - - - - - */
-
-  vueApp.component('inertia-link', Link);
-  vueApp.component('inertia-head', Head);
-
-  vueApp.component('portal', Portal);
-  vueApp.component('portal-target', PortalTarget);
-
-  vueApp.component('avatar', Avatar);
-  vueApp.component('icon', Icon);
 
   /**
    * Mount app to element and window.

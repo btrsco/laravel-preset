@@ -14,5 +14,5 @@ createInertiaApp({
     import.meta.glob('/resources/views/pages/**/*.vue'),
   ),
   setup: ({ el, App, props, plugin }) => appSetup({ el, App, props, plugin }),
-  progress: { color: '# 4b5563' },
+  progress: { color: '#4b5563' },
 });

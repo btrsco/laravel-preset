@@ -12,7 +12,8 @@
 <br />
 
 <div align="center">
-  If you want to migrate and/or seed your database, the following flags are available: <code>--migrate</code> and <code>--seed</code>. 
+  If you want to migrate and/or seed your database, the following flags are available: <code>--migrate</code> and <code>--seed</code>.
+  To avoid building a docker container, use the <code>--no-docker</code> flag.
 </div>
 
 <br />

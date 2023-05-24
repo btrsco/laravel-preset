@@ -1,5 +1,5 @@
 <template>
-    <inertia-head :title="( title ? `${title} &mdash; ` : '' ) + suffix">
+    <inertia-head :title="title">
         <meta
             head-key="description"
             name="description"
@@ -33,7 +33,7 @@
         <meta
             head-key="og:url"
             property="og:url"
-            :content="$page.props.request.url"
+            :content="$page.props.ziggy.location"
         />
 
         <meta
@@ -98,7 +98,7 @@
 
 <script>
 export default {
-    name:  'pageHead',
+    name:  'PageHead',
     props: {
         title:  { type: String, required: false },
         app:    { type: Object, required: false },
@@ -106,7 +106,6 @@ export default {
     data() {
         return {
             application: this.app ?? this.$page.props.app,
-            suffix:      this.$page.props.app.name,
         };
     },
 };
